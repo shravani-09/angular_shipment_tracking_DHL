@@ -1,0 +1,30 @@
+.loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 6px solid #facc15; /* yellow-400 */
+  border-top: 6px solid #e5e7eb; /* gray-200 */
+  border-radius: 50%;
+  animation: spin 1s linear infinite, colorShift 2s linear infinite;
+  box-shadow: 0 0 8px #facc15;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes colorShift {
+  0% {
+    border-top-color: #e5e7eb;
+  }
+  50% {
+    border-top-color: #f59e42;
+  }
+  100% {
+    border-top-color: #e5e7eb;
+  }
+}

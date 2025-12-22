@@ -1,0 +1,202 @@
+<div class="max-w-2xl mx-auto mt-10 mb-12 px-4 sm:px-6" role="main">
+  <div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-900 mb-2">
+      {{ constants.UI_LABELS.PAGE_HEADERS.TRACK_SHIPMENT }}
+    </h2>
+    <p class="text-base text-gray-600">
+      {{ constants.UI_LABELS.PAGE_DESCRIPTIONS.TRACK_SHIPMENT_DESC }}
+    </p>
+  </div>
+
+  <div class="mb-8">
+    <app-tracking-input
+      [trackingId]="trackingId"
+      [isAdmin]="isAdmin"
+      [showDropdown]="showDropdown"
+      [loadingDropdown]="loadingDropdown"
+      [dropdownError]="dropdownError"
+      [filteredTrackingIds]="filteredTrackingIds"
+      (trackingIdChange)="onInputChange($event)"
+      (search)="track()"
+      (dropdownFocus)="onDropdownFocus()"
+      (selectId)="selectTrackingId($event)"
+    ></app-tracking-input>
+  </div>
+
+  <app-loader *ngIf="loading"></app-loader>
+
+  <app-error-message *ngIf="error" [error]="error"></app-error-message>
+
+  <div
+    *ngIf="shipment as s"
+    class="space-y-4"
+    role="region"
+    aria-live="polite"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.SHIPMENT_DETAILS"
+  >
+    <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-gray-100">
+      <div class="p-6 sm:p-8">
+        <div class="hidden sm:block space-y-6">
+          <div class="flex justify-between items-center pb-6 border-b border-gray-100">
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5 mb-2">
+                <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Origin</p>
+              </div>
+              <p class="text-base font-bold text-gray-900">{{ s.origin }}</p>
+              <p class="text-xs text-gray-600 mt-1">
+                <span *ngIf="getLastMilestoneTime(s) as lastTime">
+                  {{ lastTime | date : 'MMM dd, h:mm a' }}
+                </span>
+              </p>
+            </div>
+
+            <svg
+              class="w-20 h-12 text-gray-400 shrink-0 mx-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 80 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M65 7l10 5m0 0l-10 5m10-5H2"
+              />
+            </svg>
+
+            <div class="flex-1 text-right">
+              <div class="flex items-center justify-end gap-1.5 mb-2">
+                <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fill-rule="evenodd"
+                    d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+                <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Destination
+                </p>
+              </div>
+              <p class="text-base font-bold text-gray-900">{{ s.destination }}</p>
+              <p class="text-xs text-gray-600 mt-1">
+                <span *ngIf="getLastMilestoneTime(s) as lastTime">
+                  {{ lastTime | date : 'MMM dd, h:mm a' }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pb-5 border-b border-gray-100">
+            <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+              Current Status
+            </p>
+            <app-status-badge [status]="s.currentStatus"></app-status-badge>
+          </div>
+
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                Estimated Delivery
+              </p>
+              <p class="text-lg font-bold text-gray-900">
+                {{ s.estimatedDeliveryDate | date : 'MMM dd, yyyy' }}
+              </p>
+            </div>
+            <button
+              *ngIf="isAdmin"
+              [routerLink]="['/admin/update', s.trackingId]"
+              [attr.aria-label]="
+                constants.UI_LABELS.ARIA_LABELS.UPDATE_FOR_SHIPMENT + ' ' + s.trackingId
+              "
+              class="shrink-0 bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-black font-semibold px-7 py-3 rounded-xl text-sm transition-all duration-200 shadow hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-yellow-300"
+            >
+              {{ constants.UI_LABELS.BUTTON_LABELS.UPDATE_STATUS }}
+            </button>
+          </div>
+        </div>
+
+        <div class="sm:hidden space-y-5">
+          <div>
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">
+              Shipment Route
+            </p>
+            <div class="flex gap-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-1.5 mb-2">
+                  <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">Origin</p>
+                </div>
+                <p class="text-base font-bold text-gray-900">{{ s.origin }}</p>
+              </div>
+
+              <div class="flex-1 text-right">
+                <div class="flex items-center justify-end gap-1.5 mb-2">
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                    Destination
+                  </p>
+                </div>
+                <p class="text-base font-bold text-gray-900">{{ s.destination }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-200"></div>
+
+          <div>
+            <div class="flex justify-between items-center mb-3">
+              <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                Current Status
+              </p>
+              <app-status-badge [status]="s.currentStatus"></app-status-badge>
+            </div>
+            <button
+              *ngIf="isAdmin"
+              [routerLink]="['/admin/update', s.trackingId]"
+              [attr.aria-label]="
+                constants.UI_LABELS.ARIA_LABELS.UPDATE_FOR_SHIPMENT + ' ' + s.trackingId
+              "
+              class="w-full mt-3 bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 text-black font-bold px-5 py-2.5 rounded-lg text-sm transition duration-200 shadow-md hover:shadow-lg"
+            >
+              {{ constants.UI_LABELS.BUTTON_LABELS.UPDATE_STATUS }}
+            </button>
+          </div>
+
+          <div class="border-t border-gray-200"></div>
+
+          <div class="flex flex-col items-center text-center">
+            <p class="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+              Estimated Delivery
+            </p>
+            <p class="text-base font-semibold text-gray-900">
+              {{ s.estimatedDeliveryDate | date : 'MMM dd, yyyy' }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <app-shipment-timeline [shipment]="s"></app-shipment-timeline>
+    </div>
+  </div>
+</div>

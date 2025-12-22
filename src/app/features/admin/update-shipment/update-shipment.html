@@ -1,0 +1,171 @@
+<div class="max-w-xl mx-auto mt-14 bg-white rounded-xl shadow-sm p-6" role="main">
+  <h2 class="text-lg font-semibold text-gray-900 mb-1">
+    {{ constants.UI_LABELS.PAGE_HEADERS.UPDATE_SHIPMENT }}
+  </h2>
+  <p class="text-sm text-gray-500 mb-6">
+    {{ constants.UI_LABELS.PAGE_DESCRIPTIONS.UPDATE_SHIPMENT_DESC }}
+  </p>
+
+  <div
+    *ngIf="success"
+    class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6"
+    role="status"
+    aria-live="polite"
+  >
+    {{ success }}
+  </div>
+
+  <app-error-message *ngIf="error" [error]="error"></app-error-message>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="updateShipment()"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.UPDATE_SHIPMENT_FORM"
+    [class.opacity-50]="isFormDisabled()"
+  >
+    <div class="mb-4">
+      <label for="trackingId" class="block text-gray-700 font-bold mb-2">{{
+        constants.UI_LABELS.FORM_LABELS.TRACKING_ID
+      }}</label>
+      <input
+        type="text"
+        id="trackingId"
+        [value]="trackingId"
+        disabled
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.TRACKING_ID_READONLY"
+        class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-600"
+      />
+    </div>
+
+    <div class="mb-4">
+      <label for="status" class="block text-gray-700 font-bold mb-2">
+        {{ constants.UI_LABELS.FORM_LABELS.STATUS }}
+        <span
+          class="text-red-600"
+          [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.REQUIRED_FIELD"
+          >*</span
+        >
+      </label>
+      <select
+        id="status"
+        formControlName="status"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.SELECT_SHIPMENT_STATUS"
+        aria-describedby="statusError"
+        [disabled]="isFormDisabled()"
+        class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 disabled:bg-gray-100 disabled:cursor-not-allowed bg-white text-gray-900 appearance-none cursor-pointer text-base leading-tight"
+        [class.border-red-600]="status?.touched && status?.invalid"
+      >
+        <option value="">{{ constants.UI_LABELS.FORM_LABELS.SELECT_STATUS }}</option>
+        <option
+          *ngFor="let s of shipmentStatuses"
+          [value]="convertToString(s.value)"
+          [hidden]="isStatusDisabled(s.value)"
+        >
+          {{ s.label }}
+        </option>
+      </select>
+      <div
+        *ngIf="status?.touched && status?.invalid"
+        id="statusError"
+        class="text-red-600 text-sm mt-1"
+        role="alert"
+      >
+        <span *ngIf="status?.errors?.['required']">{{
+          constants.VALIDATION_MESSAGES.STATUS.REQUIRED
+        }}</span>
+      </div>
+      <div *ngIf="isFormDisabled()" class="text-yellow-700 text-sm mt-1 font-semibold">
+        ✓ Shipment delivered. Form is read-only.
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <label for="location" class="block text-gray-700 font-bold mb-2">
+        {{ constants.UI_LABELS.FORM_LABELS.LOCATION }}
+        <span
+          class="text-red-600"
+          [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.REQUIRED_FIELD"
+          >*</span
+        >
+      </label>
+      <input
+        type="text"
+        id="location"
+        formControlName="location"
+        [placeholder]="constants.UI_LABELS.LOCATION_PLACEHOLDER"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.CURRENT_LOCATION"
+        aria-describedby="locationError locationHelp"
+        [disabled]="isFormDisabled()"
+        class="w-full px-3 py-2 border rounded focus:outline-none focus:border-yellow-400 disabled:bg-gray-100 disabled:cursor-not-allowed"
+        [class.border-red-600]="location?.touched && location?.invalid"
+      />
+      <span id="locationHelp" class="sr-only">
+        {{ constants.UI_LABELS.HELP_TEXT.LOCATION_HELP }}
+      </span>
+      <div
+        *ngIf="location?.touched && location?.invalid"
+        id="locationError"
+        class="mt-1 text-sm text-red-600"
+        role="alert"
+      >
+        <p *ngIf="location?.errors?.['required']" class="flex items-center gap-1">
+          <span class="text-red-500">●</span>
+          {{ constants.VALIDATION_MESSAGES.LOCATION.REQUIRED }}
+        </p>
+        <p *ngIf="location?.errors?.['minlength']" class="flex items-center gap-1">
+          <span class="text-red-500">●</span>
+          {{ constants.VALIDATION_MESSAGES.LOCATION.MIN_LENGTH }}
+        </p>
+        <p *ngIf="location?.errors?.['maxlength']" class="flex items-center gap-1">
+          <span class="text-red-500">●</span>
+          {{ constants.VALIDATION_MESSAGES.LOCATION.MAX_LENGTH }}
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="form.invalid || loading || isFormDisabled() || !hasAvailableStatuses()"
+      class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+    >
+      <span
+        class="whitespace-nowrap"
+        *ngIf="!loading && !isFormDisabled() && hasAvailableStatuses()"
+        >{{ constants.UI_LABELS.BUTTON_LABELS.UPDATE_STATUS }}</span
+      >
+      <span *ngIf="!loading && isFormDisabled()" class="whitespace-nowrap">Shipment Delivered</span>
+      <span
+        *ngIf="!loading && !isFormDisabled() && !hasAvailableStatuses()"
+        class="whitespace-nowrap"
+        >No Status Available</span
+      >
+      <span *ngIf="loading" class="flex items-center justify-center">
+        <span
+          class="inline-block animate-spin rounded-full h-4 w-4 border border-black border-t-transparent mr-2"
+        ></span>
+        {{ constants.UI_LABELS.BUTTON_LABELS.UPDATING }}
+      </span>
+    </button>
+
+    <button
+      type="button"
+      (click)="cancel()"
+      class="w-full mt-2 bg-gray-400 hover:bg-gray-500 text-black font-bold py-2 px-4 rounded transition-colors"
+    >
+      Cancel
+    </button>
+  </form>
+
+  <div class="mt-6 p-4 bg-blue-50 rounded border border-blue-200">
+    <p class="text-sm text-gray-700 mb-3">
+      <strong>Status Lifecycle:</strong>
+    </p>
+    <p class="text-sm text-gray-600 mb-2">
+      Created → Picked Up → In Transit → Arrived at Facility → Out for Delivery → Delivered
+    </p>
+    <p class="text-sm text-gray-600">
+      💡 <strong>Delayed</strong> and <strong>Exception</strong> statuses can be set at any point
+      (except after Delivered).
+    </p>
+  </div>
+</div>

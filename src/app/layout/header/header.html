@@ -1,0 +1,72 @@
+<header class="bg-yellow-400 shadow-md sticky top-0 z-50" role="banner">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div
+        class="h-9 w-9 p-2 rounded bg-black text-yellow-400 flex items-center justify-center font-extrabold text-lg"
+        [attr.aria-label]="constants.UI_LABELS.HEADERS.DHL_LOGO"
+      >
+        {{ constants.UI_LABELS.HEADERS.DHL }}
+      </div>
+      <div class="hidden sm:flex flex-col leading-tight">
+        <span
+          class="text-black font-semibold text-sm"
+          [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.APPLICATION_NAME"
+        >
+          {{ constants.UI_LABELS.HEADERS.SHIPMENT_TRACKING }}
+        </span>
+        <span
+          class="text-black/70 text-xs"
+          [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.APPLICATION_DESCRIPTION"
+        >
+          {{ constants.UI_LABELS.HEADERS.ADMIN_CUSTOMER_PORTAL }}
+        </span>
+      </div>
+    </div>
+
+    <nav
+      class="flex items-center gap-6 text-sm font-medium text-black"
+      role="navigation"
+      [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.MAIN_NAVIGATION"
+    >
+      <a
+        *ngIf="isLoggedIn"
+        routerLink="/track"
+        routerLinkActive="border-b-2 border-black"
+        class="pb-1 hover:opacity-80 transition"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.TRACK_SHIPMENT_LINK"
+      >
+        {{ constants.UI_LABELS.BUTTON_LABELS.TRACK }}
+      </a>
+
+      <a
+        *ngIf="isAdmin"
+        routerLink="/admin/create"
+        routerLinkActive="border-b-2 border-black"
+        class="pb-1 hover:opacity-80 transition"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.CREATE_SHIPMENT_LINK"
+      >
+        {{ constants.UI_LABELS.BUTTON_LABELS.CREATE_SHIPMENT }}
+      </a>
+
+      <span *ngIf="isLoggedIn" class="h-5 w-px bg-black/30" aria-hidden="true"></span>
+
+      <a
+        *ngIf="!isLoggedIn"
+        routerLink="/"
+        class="bg-black text-yellow-400 px-4 py-1.5 rounded hover:bg-black/90 transition"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.LOGIN_LINK"
+      >
+        {{ constants.UI_LABELS.BUTTON_LABELS.LOGIN }}
+      </a>
+
+      <button
+        *ngIf="isLoggedIn"
+        (click)="logout()"
+        class="text-black hover:text-black/70 transition"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.LOGOUT_BUTTON"
+      >
+        {{ constants.UI_LABELS.BUTTON_LABELS.LOGOUT }}
+      </button>
+    </nav>
+  </div>
+</header>

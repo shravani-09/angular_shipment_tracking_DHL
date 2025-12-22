@@ -1,0 +1,49 @@
+<div class="max-w-sm mx-auto mt-24 bg-white rounded-xl shadow-sm p-6" role="main">
+  <h2 class="text-lg font-semibold mb-4">{{ constants.UI_LABELS.PAGE_HEADERS.LOGIN }}</h2>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="space-y-4"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.USER_LOGIN_FORM"
+  >
+    <div>
+      <input
+        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400"
+        [placeholder]="constants.UI_LABELS.EMAIL_PLACEHOLDER"
+        formControlName="email"
+        type="email"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.EMAIL_ADDRESS"
+        aria-describedby="emailHelp"
+      />
+      <span id="emailHelp" class="sr-only">{{ constants.UI_LABELS.EMAIL_HELP }}</span>
+    </div>
+
+    <div>
+      <input
+        type="password"
+        class="w-full border rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-yellow-400"
+        [placeholder]="constants.UI_LABELS.PASSWORD_PLACEHOLDER"
+        formControlName="password"
+        [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.PASSWORD_FIELD"
+        aria-describedby="passwordHelp"
+      />
+      <span id="passwordHelp" class="sr-only">{{ constants.UI_LABELS.PASSWORD_HELP }}</span>
+    </div>
+
+    <button
+      class="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-medium py-2 rounded-md transition"
+      [disabled]="loading"
+      [attr.aria-busy]="loading"
+      [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.LOGIN_BUTTON"
+    >
+      {{
+        loading
+          ? constants.UI_LABELS.BUTTON_LABELS.LOGGING_IN
+          : constants.UI_LABELS.BUTTON_LABELS.LOGIN
+      }}
+    </button>
+  </form>
+
+  <app-error-message *ngIf="error" [error]="error"></app-error-message>
+</div>

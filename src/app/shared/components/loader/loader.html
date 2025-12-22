@@ -1,0 +1,12 @@
+<div
+  class="flex justify-center items-center py-8"
+  role="status"
+  aria-live="polite"
+  [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.LOADING_INDICATOR"
+>
+  <div
+    class="h-8 w-8 rounded-full border-4 border-yellow-400 border-t-transparent animate-spin"
+    aria-hidden="true"
+  ></div>
+  <span class="sr-only">Loading...</span>
+</div>

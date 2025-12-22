@@ -1,0 +1,85 @@
+<div *ngIf="shipment as s" class="mt-8">
+  <h2 class="text-sm font-semibold text-gray-900 mb-6">Shipment History</h2>
+
+  <div
+    class="relative pl-8"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.SHIPMENT_MILESTONES"
+  >
+    <div
+      class="absolute left-2.5 top-2 bottom-0 w-1"
+      [style.background]="
+        s.currentStatus === 6
+          ? 'linear-gradient(to bottom, #ef4444, #d1d5db)'
+          : 'linear-gradient(to bottom, #eab308, #d1d5db)'
+      "
+      style="z-index: 0"
+    ></div>
+
+    <div class="space-y-8">
+      <div
+        *ngFor="let m of s.milestones; let last = last; trackBy: trackByIndex"
+        class="relative flex gap-4"
+        role="listitem"
+        [attr.aria-label]="getStatusLabel(m.status) + ' at ' + m.location"
+      >
+        <div
+          class="h-6 w-6 rounded-full border-4 shrink-0 -ml-8 relative"
+          style="z-index: 10"
+          [ngClass]="{
+            'bg-yellow-400 border-yellow-400': isMilestoneCompleted(m, s) && !isMilestoneDelayed(m),
+            'bg-red-500 border-red-500': isMilestoneDelayed(m),
+            'bg-gray-300 border-gray-300': !isMilestoneCompleted(m, s) && !isMilestoneDelayed(m)
+          }"
+        ></div>
+
+        <div class="flex-1 pt-0.5">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h4
+                class="text-sm font-semibold leading-tight"
+                [ngClass]="{
+                  'text-gray-800': isMilestoneCompleted(m, s) && !isMilestoneDelayed(m),
+                  'text-red-700': isMilestoneDelayed(m),
+                  'text-gray-600': !isMilestoneCompleted(m, s) && !isMilestoneDelayed(m)
+                }"
+              >
+                {{ getStatusLabel(m.status) }}
+              </h4>
+              <p
+                class="text-xs mt-0.5 font-medium"
+                [ngClass]="{
+                  'text-gray-700': isMilestoneCompleted(m, s) && !isMilestoneDelayed(m),
+                  'text-red-600': isMilestoneDelayed(m),
+                  'text-gray-500': !isMilestoneCompleted(m, s) && !isMilestoneDelayed(m)
+                }"
+              >
+                📍 {{ m.location }}
+              </p>
+              <p
+                class="text-xs mt-1"
+                [ngClass]="{
+                  'text-gray-600': isMilestoneCompleted(m, s) && !isMilestoneDelayed(m),
+                  'text-red-500': isMilestoneDelayed(m),
+                  'text-gray-400': !isMilestoneCompleted(m, s) && !isMilestoneDelayed(m)
+                }"
+              >
+                {{ formatTimestamp(m.timestamp) }}
+              </p>
+            </div>
+            <span
+              class="text-xs px-2 py-1 rounded-full shrink-0"
+              [ngClass]="{
+                'bg-yellow-200 text-yellow-800':
+                  isMilestoneCompleted(m, s) && !isMilestoneDelayed(m),
+                'bg-red-200 text-red-800': isMilestoneDelayed(m),
+                'bg-gray-200 text-gray-600': !isMilestoneCompleted(m, s) && !isMilestoneDelayed(m)
+              }"
+            >
+              {{ isMilestoneCompleted(m, s) ? '✓' : isMilestoneDelayed(m) ? '⚠' : '—' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

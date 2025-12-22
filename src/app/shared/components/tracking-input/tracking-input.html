@@ -1,0 +1,75 @@
+<div class="flex flex-col sm:flex-row gap-3">
+  <div *ngIf="isAdmin" class="w-full relative">
+    <input
+      [(ngModel)]="trackingId"
+      (ngModelChange)="onInputChange($event)"
+      (focus)="onDropdownFocus()"
+      [placeholder]="constants.UI_LABELS.DROPDOWN_LABELS.SEARCH_PLACEHOLDER"
+      pattern="^DHL\d{6}$"
+      [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.TRACKING_ID_INPUT"
+      aria-describedby="trackingIdHelp"
+      autocomplete="off"
+      class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 invalid:border-red-600"
+    />
+    <span id="trackingIdHelp" class="sr-only">{{
+      constants.UI_LABELS.TRACKING_ID_FORMAT_HELP
+    }}</span>
+
+    <div
+      *ngIf="showDropdown"
+      class="absolute top-full left-0 right-0 mt-1 bg-white border rounded-md shadow-lg z-50 overflow-hidden"
+      role="listbox"
+      [attr.aria-label]="constants.UI_LABELS.DROPDOWN_LABELS.SELECT_SHIPMENT"
+    >
+      <div *ngIf="loadingDropdown" class="px-3 py-2 text-center text-sm text-gray-500">
+        {{ constants.UI_LABELS.DROPDOWN_LABELS.LOADING_SHIPMENTS }}
+      </div>
+
+      <div *ngIf="dropdownError && !loadingDropdown" class="px-3 py-2 text-sm text-red-600">
+        {{ dropdownError }}
+      </div>
+
+      <div
+        *ngIf="!loadingDropdown && !dropdownError && filteredTrackingIds.length > 0"
+        class="max-h-48 overflow-y-auto"
+      >
+        <button
+          *ngFor="let id of filteredTrackingIds; trackBy: trackByIndex"
+          type="button"
+          (click)="onSelectTrackingId(id)"
+          class="w-full text-left px-3 py-2 hover:bg-yellow-50 text-sm text-gray-700 border-b last:border-b-0 transition"
+          role="option"
+          [attr.aria-selected]="trackingId === id"
+        >
+          {{ id }}
+        </button>
+      </div>
+
+      <div
+        *ngIf="!loadingDropdown && !dropdownError && filteredTrackingIds.length === 0"
+        class="px-3 py-2 text-center text-sm text-gray-500"
+      >
+        {{ constants.UI_LABELS.DROPDOWN_LABELS.NO_RESULTS }}
+      </div>
+    </div>
+  </div>
+
+  <input
+    *ngIf="!isAdmin"
+    [(ngModel)]="trackingId"
+    (ngModelChange)="onInputChange($event)"
+    [placeholder]="constants.UI_LABELS.TRACKING_ID_PLACEHOLDER"
+    pattern="^DHL\d{6}$"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.TRACKING_ID_INPUT"
+    aria-describedby="trackingIdHelp"
+    class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 invalid:border-red-600"
+  />
+
+  <button
+    (click)="onSearch()"
+    [attr.aria-label]="constants.UI_LABELS.ARIA_LABELS.SEARCH_TRACKING"
+    class="bg-yellow-400 hover:bg-yellow-500 text-black font-medium px-5 py-2 rounded-md transition"
+  >
+    {{ constants.UI_LABELS.BUTTON_LABELS.TRACK }}
+  </button>
+</div>
