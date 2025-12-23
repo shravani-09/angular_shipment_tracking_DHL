@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, catchError, throwError, Subject, shareReplay } from 'rxjs';
+import { Observable, catchError, throwError, Subject, shareReplay, BehaviorSubject } from 'rxjs';
 import { Shipment } from '../models/shipment.model';
 
 @Injectable({
@@ -10,6 +10,8 @@ export class ShipmentService {
   private readonly baseUrl = 'http://localhost:5108/api';
   private shipmentUpdated$ = new Subject<void>();
   private adminShipmentCache$: Observable<Shipment[]> | null = null;
+  private lastViewedTrackingId$ = new BehaviorSubject<string | null>(null);
+  private lastViewedShipment$ = new BehaviorSubject<Shipment | null>(null);
 
   constructor(private http: HttpClient) {}
 
@@ -61,5 +63,23 @@ export class ShipmentService {
 
   clearAdminCache(): void {
     this.adminShipmentCache$ = null;
+  }
+
+  setLastViewedShipment(trackingId: string, shipment: Shipment): void {
+    this.lastViewedTrackingId$.next(trackingId);
+    this.lastViewedShipment$.next(shipment);
+  }
+
+  getLastViewedTrackingId(): Observable<string | null> {
+    return this.lastViewedTrackingId$.asObservable();
+  }
+
+  getLastViewedShipment(): Observable<Shipment | null> {
+    return this.lastViewedShipment$.asObservable();
+  }
+
+  clearLastViewedShipment(): void {
+    this.lastViewedTrackingId$.next(null);
+    this.lastViewedShipment$.next(null);
   }
 }

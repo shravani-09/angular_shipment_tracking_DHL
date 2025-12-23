@@ -234,4 +234,57 @@ describe('ShipmentService', () => {
       expect(errorOccurred).toBe(true);
     });
   });
+
+  describe('lastViewedShipment', () => {
+    it('should set last viewed shipment', () => {
+      const trackingId = 'DHL123456';
+      service.setLastViewedShipment(trackingId, mockShipment);
+
+      let result: Shipment | null = null;
+      service.getLastViewedShipment().subscribe((shipment) => {
+        result = shipment;
+      });
+
+      expect(result).toEqual(mockShipment);
+    });
+
+    it('should get last viewed tracking ID', () => {
+      const trackingId = 'DHL123456';
+      service.setLastViewedShipment(trackingId, mockShipment);
+
+      let result: string | null = null;
+      service.getLastViewedTrackingId().subscribe((id) => {
+        result = id;
+      });
+
+      expect(result).toEqual(trackingId);
+    });
+
+    it('should clear last viewed shipment', () => {
+      const trackingId = 'DHL123456';
+      service.setLastViewedShipment(trackingId, mockShipment);
+      service.clearLastViewedShipment();
+
+      let result: Shipment | null = mockShipment;
+      service.getLastViewedShipment().subscribe((shipment) => {
+        result = shipment;
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it('should clear last viewed tracking ID', () => {
+      const trackingId = 'DHL123456';
+      service.setLastViewedShipment(trackingId, mockShipment);
+      service.clearLastViewedShipment();
+
+      let result: string | null = trackingId;
+      service.getLastViewedTrackingId().subscribe((id) => {
+        result = id;
+      });
+
+      expect(result).toBeNull();
+    });
+  });
 });
+

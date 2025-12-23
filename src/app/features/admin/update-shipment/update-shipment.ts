@@ -231,6 +231,7 @@ export class UpdateShipment implements OnInit {
         next: (shipment: Shipment): void => {
           this.success = APP_CONSTANTS.ERROR_MESSAGES.SHIPMENT_UPDATED_SUCCESS;
           this.loading = false;
+          this.shipmentService.setLastViewedShipment(this.trackingId, shipment);
           setTimeout(() => {
             this.shipmentService.notifyShipmentUpdated();
             this.router.navigate(['/track']);

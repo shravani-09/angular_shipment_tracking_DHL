@@ -34,6 +34,7 @@ describe('UpdateShipment Component', () => {
       updateStatus: vi.fn(() => of(mockShipment)),
       trackShipment: vi.fn(() => of(mockShipment)),
       notifyShipmentUpdated: vi.fn(),
+      setLastViewedShipment: vi.fn(),
     };
     const mockRouter = {
       navigate: vi.fn(),
@@ -295,6 +296,39 @@ describe('UpdateShipment Component', () => {
       });
       component.updateShipment();
       expect(component.success).toBe('Shipment updated successfully');
+    });
+  });
+
+  describe('setLastViewedShipment', () => {
+    beforeEach(() => {
+      component.ngOnInit();
+      component.trackingId = 'DHL001';
+    });
+
+    it('should call setLastViewedShipment after successful update', () => {
+      component.form.patchValue({
+        status: '3',
+        location: 'Chicago',
+      });
+      component.updateShipment();
+
+      expect(shipmentService.setLastViewedShipment).toHaveBeenCalledWith('DHL001', mockShipment);
+    });
+
+    it('should notify shipment updated and navigate after delay', () => {
+      vi.useFakeTimers();
+      component.form.patchValue({
+        status: '3',
+        location: 'Chicago',
+      });
+      component.updateShipment();
+
+      vi.advanceTimersByTime(2100);
+
+      expect(shipmentService.notifyShipmentUpdated).toHaveBeenCalled();
+      expect(router.navigate).toHaveBeenCalledWith(['/track']);
+
+      vi.useRealTimers();
     });
   });
 });
