@@ -89,7 +89,10 @@ export class TrackShipment implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.refetchAdminShipments();
+        this.loadLastViewedShipment();
       });
+
+    this.loadLastViewedShipment();
 
     this.searchInput$
       .pipe(
@@ -107,6 +110,36 @@ export class TrackShipment implements OnInit {
           this.filteredTrackingIds = [];
           this.cdr.markForCheck();
         },
+      });
+  }
+
+  private loadLastViewedShipment(): void {
+    this.shipmentService
+      .getLastViewedShipment()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((shipment: Shipment | null) => {
+        if (shipment) {
+          this.shipmentService
+            .getLastViewedTrackingId()
+            .pipe(
+              takeUntilDestroyed(this.destroyRef),
+              switchMap((trackingId: string | null) => {
+                if (trackingId) {
+                  this.trackingId = trackingId;
+                  return this.shipmentService.trackShipment(trackingId);
+                }
+                return of(null);
+              })
+            )
+            .subscribe((data: Shipment | null) => {
+              if (data) {
+                this.shipment = data;
+                this.error = '';
+              }
+              this.shipmentService.clearLastViewedShipment();
+              this.cdr.markForCheck();
+            });
+        }
       });
   }
 

@@ -37,6 +37,10 @@ describe('TrackShipment Component', () => {
       trackShipment: vi.fn(() => of(mockShipment)),
       getShipmentUpdatedNotifier: vi.fn(() => of()),
       getAdminCreatedShipments: vi.fn(() => of([mockShipment])),
+      setLastViewedShipment: vi.fn(),
+      getLastViewedTrackingId: vi.fn(() => of(null)),
+      getLastViewedShipment: vi.fn(() => of(null)),
+      clearLastViewedShipment: vi.fn(),
     };
 
     await TestBed.configureTestingModule({
@@ -323,6 +327,45 @@ describe('TrackShipment Component', () => {
 
       const milestoneItems = fixture.debugElement.queryAll(By.css('[role="listitem"]'));
       expect(milestoneItems.length).toBe(mockShipment.milestones.length);
+    });
+  });
+
+  describe('Last Viewed Shipment', () => {
+    it('should load last viewed shipment on init when admin navigates back', () => {
+      vi.spyOn(shipmentService, 'getLastViewedShipment').mockReturnValue(of(mockShipment));
+      vi.spyOn(shipmentService, 'getLastViewedTrackingId').mockReturnValue(of('DHL123456'));
+      vi.spyOn(shipmentService, 'trackShipment').mockReturnValue(of(mockShipment));
+
+      fixture = TestBed.createComponent(TrackShipment);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      expect(component.shipment).toEqual(mockShipment);
+      expect(component.trackingId).toBe('DHL123456');
+    });
+
+    it('should clear last viewed shipment after loading', () => {
+      vi.spyOn(shipmentService, 'getLastViewedShipment').mockReturnValue(of(mockShipment));
+      vi.spyOn(shipmentService, 'getLastViewedTrackingId').mockReturnValue(of('DHL123456'));
+      vi.spyOn(shipmentService, 'trackShipment').mockReturnValue(of(mockShipment));
+
+      fixture = TestBed.createComponent(TrackShipment);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      expect(shipmentService.clearLastViewedShipment).toHaveBeenCalled();
+    });
+
+    it('should not auto-load when no last viewed shipment exists', () => {
+      vi.spyOn(shipmentService, 'getLastViewedShipment').mockReturnValue(of(null));
+      vi.spyOn(shipmentService, 'getLastViewedTrackingId').mockReturnValue(of(null));
+
+      fixture = TestBed.createComponent(TrackShipment);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+
+      expect(component.shipment).toBeUndefined();
+      expect(component.trackingId).toBe('');
     });
   });
 });
